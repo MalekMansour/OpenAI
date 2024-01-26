@@ -1,5 +1,11 @@
-pip install openai
-pip install requests
+# OpenAI API Integration
 
-// If using Gradio
-pip install gradio
+## Python Implementation
+
+1. Install the necessary packages:
+
+   ```bash
+   pip install openai
+   pip install requests
+   # If using Gradio
+   pip install gradio
