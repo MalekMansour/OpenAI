@@ -1,6 +1,6 @@
-File: 
+File: dalle.py
 
-Goal:
+Goal: Creating AI Generated Images.
 
 Why?:
 
