@@ -1,6 +1,6 @@
-File: gpt.py
+File: gpt.py , gpt.html , gradio.py
 
-Goal:
+Goal: Creating a chatbot powered by AI.
 
 Why?:
 
