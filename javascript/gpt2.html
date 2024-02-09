@@ -128,3 +128,99 @@
     }
     
 </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="category-bar">
+        <button class="category-button" onclick="changePrompt('Option1')">Option1</button>
+        <button class="category-button" onclick="changePrompt('Option2')">Option2</button>
+        <button class="category-button" onclick="changePrompt('Option3')">Option3</button>
+        <!-- Add More Categories  Here -->
+    </div>
+    <div id="welcome-message">How can I help you today?</div>
+    <div id="chat-log"></div>
+    <div id="typing-indicator"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+
+<script>
+  const openaiApiKey = "MY_API_KEY";
+  const messages = [];
+  const chatLog = document.getElementById("chat-log");
+  const userInput = document.getElementById("user-input");
+  const typingIndicator = document.getElementById("typing-indicator")
+
+  const systemMsg = `
+  Vanilla ChatGPT Prompt...
+  `;
+
+  messages.push({ "role": "system", "content": systemMsg });
+
+  function updateChatLog() {
+    chatLog.innerHTML = messages
+      .filter(msg => msg.role !== "system")  
+      .map(msg => `<p><strong>${msg.role}:</strong> ${makeLinksClickable(msg.content)}</p>`)
+      .join('');
+  }
+
+  function removePeriodFromUrl(url) {
+    return url.endsWith('.') ? url.slice(0, -1) : url;
+  }
+
+  function makeLinksClickable(content) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return content.replace(urlRegex, (url) => {
+      const cleanedUrl = removePeriodFromUrl(url);
+      return `<a href="#" onclick="window.open('${cleanedUrl}', '_blank'); return false;">${cleanedUrl}</a>`;
+    });
+  }
+
+  function changePrompt(category) {
+    const userInput = document.getElementById("user-input");
+    userInput.value = `Tell me about the ${category} .`;
+  }
+
+  function showTypingIndicator() {
+    typingIndicator.innerText = "Assistant is typing...";
+  }
+
+  function hideTypingIndicator() {
+    typingIndicator.innerText = "";
+  }
+
+  function sendMessage() {
+    const userMessage = userInput.value;
+    messages.push({ "role": "user", "content": userMessage });
+
+    showTypingIndicator();
+
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const assistantReply = data.choices[0].message.content;
+      messages.push({ "role": "assistant", "content": assistantReply });
+
+      hideTypingIndicator();
+      updateChatLog();
+    })
+    .catch(error => console.error("Error:", error));
+
+    userInput.value = "";
+  }
+
+  updateChatLog();
+</script>
+</body>
+</html>
