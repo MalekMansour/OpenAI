@@ -1,1 +1,85 @@
-// content to be added
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot</title>
+  <style>
+    body{background-color: rgb(29, 29, 29); color: #ccc;}
+    #chat-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    input{
+      height: 30px;
+      width: 400px;
+      background: rgb(29, 29, 29);
+      color: #ccc;
+      border-color: #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat-container">
+  <div id="chat-log"></div>
+  <input type="text" id="user-input" placeholder="Type your message...">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+  const openaiApiKey = "MY_API_KEY";
+  const messages = [];
+  const chatLog = document.getElementById("chat-log");
+  const userInput = document.getElementById("user-input");
+
+  const systemMsg = `
+    Vanilla ChatGPT (Default)...
+    ...
+    ...
+    ...
+  `;
+
+  messages.push({ "role": "system", "content": systemMsg });
+
+  function updateChatLog() {
+    chatLog.innerHTML = messages
+      .filter(msg => msg.role !== "system")  
+      .map(msg => `<p><strong>${msg.role}:</strong> ${msg.content}</p>`)
+      .join('');
+  }
+
+  function sendMessage() {
+    const userMessage = userInput.value;
+    messages.push({ "role": "user", "content": userMessage });
+
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const assistantReply = data.choices[0].message.content;
+      messages.push({ "role": "assistant", "content": assistantReply });
+      updateChatLog();
+    })
+    .catch(error => console.error("Error:", error));
+
+    userInput.value = "";
+  }
+
+  updateChatLog();
+</script>
+</body>
+</html>
