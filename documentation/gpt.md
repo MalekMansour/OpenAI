@@ -1,7 +1,15 @@
-File: gpt.py , gpt1.html , gpt2.html , gradio.py
+# Creating an AI-Powered Chatbot with OpenAI
 
-Goal: Creating a chatbot powered by AI.
+## Goal
+The goal of this project is to create a chatbot powered by AI using the OpenAI GPT (Generative Pre-trained Transformer) model.
 
-Why?: Creating AI Assistants in different applications might always be something you want. Our OpenAI project is the key to making this possible. You can change the way your assistant talks as much as you want and it is very easy.
+## Why
+Creating AI assistants in various applications can greatly enhance user experience and productivity. Our OpenAI project provides the means to achieve this goal, offering flexibility in customizing the chatbot's conversational style according to user preferences. With the ability to easily modify the chatbot's behavior, users can tailor it to suit their specific needs and preferences.
 
-How?: We are using a OpenAI API key. Using model "gpt-3.5-turbo". system_msg is used to customise and moderate the AI Chatbot to the user's liking. gpt.html is the HTML/Javascript version of the gpt.py file. gradio.py is the same as gpt.py but powered by gradio.
+## How
+We utilize an OpenAI API key and leverage the capabilities of the "gpt-3.5-turbo" model to power our chatbot. The system_msg parameter allows for customizing and moderating the AI chatbot's responses to align with the user's preferences. Additionally, we provide multiple implementations: 
+- `gpt.py`: Python script utilizing the OpenAI GPT model.
+- `gpt1.html` and `gpt2.html`: HTML/JavaScript versions of the chatbot interface.
+- `gradio.py`: Similar to `gpt.py`, but powered by Gradio, providing a user-friendly interface for interacting with the chatbot.
+
+These implementations offer flexibility and ease of use, enabling users to integrate the chatbot into their applications seamlessly.
