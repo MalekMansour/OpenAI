@@ -28,11 +28,11 @@ Welcome to the OpenAI repository! This repository hosts a collection of projects
 - **Why**: AI assistants can enhance user experience and productivity across various applications.
 - **How**: Utilizing the OpenAI GPT model and an API key, users can interact with the chatbot through Python scripts or HTML/JavaScript interfaces. Additionally, a Gradio-powered version provides a user-friendly interface for interaction.
 
-## Installation
-To use the scripts and projects in this repository, you may need to install dependencies such as OpenCV, NumPy, and Gradio. Ensure you have the required packages installed using `pip`, as mentioned in each project's README. 
-
 ## Today
 HAPPY VALENTINE EVERYBODY
+
+## Installation
+To use the scripts and projects in this repository, you may need to install dependencies such as OpenCV, NumPy, and Gradio. Ensure you have the required packages installed using `pip`, as mentioned in each project's README. 
 
 ```bash
 pip install opencv-python numpy imutils gradio
