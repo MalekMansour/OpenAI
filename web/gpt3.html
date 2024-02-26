@@ -1,1 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap">
+  <title>AI Chatbot</title>
+  <style>
+    body {
+        background: linear-gradient(to right, #1e1e1e, #343434);
+        color: #ccc;
+        margin: 0;
+        padding: 0;
+        font-family: 'Lato', sans-serif;
+    }
+
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background: #171717;
+        color: #ccc;
+        padding: 20px;
+        box-sizing: border-box;
+        transition: transform 0.3s ease;
+        transform: translateX(-250px);
+    }
+
+    #sidebar.active {
+        transform: translateX(0);
+    }
+
+    #sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #sidebar ul li {
+        padding: 10px 0;
+    }
+
+    #sidebar ul li a {
+        text-decoration: none;
+        color: #ccc;
+        font-size: 18px;
+    }
+
+    #sidebar ul li a:hover {
+        color: #fff;
+    }
+
+    #menu-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        cursor: pointer;
+        z-index: 999;
+    }
+
+    #menu-toggle span {
+        display: block;
+        width: 30px;
+        height: 5px;
+        background: #fff;
+        margin: 5px 0;
+    }
+
+    #chat-container {
+        margin-left: 250px;
+        padding: 20px;
+        border: 5px solid;
+        border-color:rgb(29, 29, 29);
+        background-color: rgba(29, 29, 29, 0.9);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        height: 100vh;
+    }
+
+    #category-bar {
+        background: #171717;
+        border-radius: 12px;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        margin-bottom: 10px;
+        -ms-overflow-style: none; 
+        scrollbar-width: none;  
+    }
+
+    .category-button {
+        background: none;
+        border: none;
+        color: #ccc;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+        padding: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .category-button:hover {
+        color: #fff;
+    }
+
+    #chat-log {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 10px;
+        padding-right: 10px;
+        -ms-overflow-style: none;  
+        scrollbar-width: none;  
+    }
+
+    #chat-log::-webkit-scrollbar,
+    #category-bar::-webkit-scrollbar {
+        display: none; 
+    }
+
+    #input-container {
+    position: relative;
+    display: inline-block;
+}
+.input-container {
+    position: relative;
+    margin-top: 10px;
+}
+
+input[type="text"] {
+    height: 40px;
+    width: calc(100% - 50px); 
+    background: rgb(29, 29, 29); 
+    color: #ccc; 
+    border: 2px solid; 
+    border-radius: 20px; 
+    padding: 0 15px; 
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none; 
+}
+
+button#send-button {
+    height: 40px;
+    width: 40px; 
+    background: #ffffff; 
+    color: #2e2e2e; 
+    border: none;
+    border-radius: 50%; 
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 14px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+    button#send-button:hover {
+        background: #414141;
+    }
+
+    #cooldown-message,
+    #error-message,
+    #typing-indicator,
+    #welcome-message {
+        font-family: 'Lato', sans-serif;        
+        text-align: center;
+        font-size: 24px; 
+        color: #fff; 
+        margin-bottom: 20px; 
+    }
+
+    a {
+      color: #800080;
+      text-decoration: none; 
+    }
+
+    a:hover {
+      text-decoration: underline; 
+    }
+
+    @media (max-width: 600px) {
+        #chat-container {
+            margin-left: 0;
+            max-width: 90%;
+        }
+    }
+  </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <ul>
+        <li><a href="#">Saved Chats</a></li>
+        <!-- Add more sidebar links here -->
+    </ul>
+</div>
+
+<div id="chat-container">
+    <div id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div id="category-bar">
+        <button class="category-button" onclick="changePrompt('Option1')">Option1</button>
+        <button class="category-button" onclick="changePrompt('Option2')">Option2</button>
+        <button class="category-button" onclick="changePrompt('Option3')">Option3</button>
+        <!-- Add More Categories  Here -->
+    </div>
+    <div id="welcome-message">How can I help you today?</div>
+    <div id="chat-log"></div>
+    <div id="typing-indicator"></div>
+    <div id="input-container">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-button" onclick="sendMessage()">➤</button>
+    </div>        
+</div>
+
+<script>
+  const openaiApiKey = "MY_API_KEY";
+  const messages = [];
+  const chatLog = document.getElementById("chat-log");
+  const userInput = document.getElementById("user-input");
+  const typingIndicator = document.getElementById("typing-indicator");
+  const sidebar = document.getElementById("sidebar");
+  const menuToggle = document.getElementById("menu-toggle");
+
+  const systemMsg = `
+  Vanilla ChatGPT Prompt (default)...
+  ...
+  ...
+  ...
+  `;
+
+  messages.push({ "role": "system", "content": systemMsg });
+
+  function updateChatLog() {
+    chatLog.innerHTML = messages
+      .filter(msg => msg.role !== "system")  
+      .map(msg => `<p><strong>${msg.role}:</strong> ${makeLinksClickable(msg.content)}</p>`)
+      .join('');
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function removePeriodFromUrl(url) {
+    return url.endsWith('.') ? url.slice(0, -1) : url;
+  }
+
+  function makeLinksClickable(content) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return content.replace(urlRegex, (url) => {
+      const cleanedUrl = removePeriodFromUrl(url);
+      return `<a href="#" onclick="window.open('${cleanedUrl}', '_blank'); return false;">${cleanedUrl}</a>`;
+    });
+  }
+
+  function changePrompt(category) {
+    const userInput = document.getElementById("user-input");
+    userInput.value = `Tell me about the ${category} .`;
+  }
+
+  function showTypingIndicator() {
+    typingIndicator.innerText = "Assistant is typing...";
+  }
+
+  function hideTypingIndicator() {
+    typingIndicator.innerText = "";
+  }
+
+  function toggleSidebar() {
+    sidebar.classList.toggle("active");
+  }
+
+  menuToggle.addEventListener("click", toggleSidebar);
+
+  function sendMessage() {
+    const userMessage = userInput.value;
+    messages.push({ "role": "user", "content": userMessage });
+
+    showTypingIndicator();
+
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const assistantReply = data.choices[0].message.content;
+      messages.push({ "role": "assistant", "content": assistantReply });
+
+      hideTypingIndicator();
+      updateChatLog();
+    })
+    .catch(error => console.error("Error:", error));
+
+    userInput.value = "";
+  }
+
+  updateChatLog();
+</script>
+</body>
+</html>
 
